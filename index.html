@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="login" id="login" hidden>
+    <h1>Sign in</h1>
+    <input id="em" type="email" placeholder="Email" autocomplete="email">
+    <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+    <button class="add" id="signin">Sign in</button>
+    <button class="cancel" id="signup">Create account</button>
+    <div class="status" id="lmsg"></div>
+  </div>
+  <div class="top" id="top"><h1>Notes</h1><span><button class="sm" id="out">Sign out</button> <button class="plus" id="plus">+ Add</button></span></div>
+  <div class="compose" id="compose" hidden>
+    <input id="label" placeholder="Title (optional)" autocomplete="off">
+    <input id="user" placeholder="Username (optional)" autocomplete="off" autocapitalize="none">
+    <input id="pass" placeholder="Password (optional)" autocomplete="off" autocapitalize="none">
+    <textarea id="text" placeholder="Write a note"></textarea>
+    <button class="add" id="add">Add</button><button class="cancel" id="cancel">Cancel</button>
+  </div>
+  <div class="status" id="status">Loading…</div>
+  <div id="list"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script src="app.js"></script>
+</body>
+</html>
