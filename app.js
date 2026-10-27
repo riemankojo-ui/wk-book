@@ -115,7 +115,7 @@ function unlock(){unlocked=true;$("pin").hidden=true;showLogin(false);loadNotes(
 async function pinDone(){
   if(pinMode==="set"){first=buf;buf="";pinMode="confirm";$("ptitle").textContent=TITLES.confirm;drawDots();return}
   if(pinMode==="confirm"){
-    if(buf===first){var h=await sha(buf);var u=(await sb.auth.getUser()).data.user;var w=await sb.from("user_pin").upsert({user_id:u.id,pin_hash:h});if(w.error){showPin("set");$("pmsg").textContent="Could not save the key. Try again.";return}pinHash=h;resetPin=false;unlock();return}
+    if(buf===first){var h=await sha(buf);var u=(await sb.auth.getUser()).data.user;var w=await sb.from("user_pin").upsert({user_id:u.id,pin_hash:h});if(w.error){var em=w.error.message;showPin("set");$("pmsg").textContent="Could not save: "+em;return}pinHash=h;resetPin=false;unlock();return}
     showPin("set");$("pmsg").textContent="Keys did not match. Try again.";return;
   }
   if((await sha(buf))===getPin()){fails=0;unlock();return}
