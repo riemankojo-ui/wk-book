@@ -93,12 +93,14 @@ async function auth(kind){
   var r=kind==="up"?await sb.auth.signUp({email:em,password:pw}):await sb.auth.signInWithPassword({email:em,password:pw});
   if(r.error){msg.textContent=r.error.message;return}
   if(!r.data.session){msg.textContent="Check your email to confirm, then sign in.";return}
-  $("pw").value="";if(getPin()){unlocked=true;showLogin(false);await loadNotes()}else{showPin("set")}
+  $("pw").value="";await loadPin();showPin(getPin()&&!resetPin?"check":"set");
 }
 $("signin").addEventListener("click",function(){auth("in")});
 $("signup").addEventListener("click",function(){auth("up")});
 $("out").addEventListener("click",async function(){await sb.auth.signOut();notes=[];render();showLogin(true)});
-function getPin(){try{return localStorage.getItem("notes.pin")}catch(e){return null}}
+var pinHash=null,resetPin=false;
+function getPin(){return pinHash}
+async function loadPin(){var r=await sb.from("user_pin").select("pin_hash").maybeSingle();pinHash=r.data?r.data.pin_hash:null}
 async function sha(s){var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("notes-pin:"+s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")}
 var pinMode="check",buf="",first="",fails=0,lockUntil=0,unlocked=false;
 var TITLES={set:"Create a 6-digit key",confirm:"Confirm your key",check:"Enter your key"};
@@ -113,7 +115,7 @@ function unlock(){unlocked=true;$("pin").hidden=true;showLogin(false);loadNotes(
 async function pinDone(){
   if(pinMode==="set"){first=buf;buf="";pinMode="confirm";$("ptitle").textContent=TITLES.confirm;drawDots();return}
   if(pinMode==="confirm"){
-    if(buf===first){try{localStorage.setItem("notes.pin",await sha(buf))}catch(e){}unlock();return}
+    if(buf===first){var h=await sha(buf);var u=(await sb.auth.getUser()).data.user;var w=await sb.from("user_pin").upsert({user_id:u.id,pin_hash:h});if(w.error){showPin("set");$("pmsg").textContent="Could not save the key. Try again.";return}pinHash=h;resetPin=false;unlock();return}
     showPin("set");$("pmsg").textContent="Keys did not match. Try again.";return;
   }
   if((await sha(buf))===getPin()){fails=0;unlock();return}
@@ -138,7 +140,7 @@ async function press(d){
   });
 })();
 $("forgot").addEventListener("click",async function(){
-  try{localStorage.removeItem("notes.pin")}catch(e){}
+  resetPin=true;
   await sb.auth.signOut();notes=[];render();$("pin").hidden=true;showLogin(true);
 });
 document.addEventListener("visibilitychange",function(){
@@ -147,7 +149,7 @@ document.addEventListener("visibilitychange",function(){
 (async function init(){
   if(sb){
     var s=await sb.auth.getSession();
-    if(s.data.session){showPin(getPin()?"check":"set")}else{showLogin(true)}
+    if(s.data.session){await loadPin();showPin(getPin()?"check":"set")}else{showLogin(true)}
     return;
   }
   try{
