@@ -93,15 +93,61 @@ async function auth(kind){
   var r=kind==="up"?await sb.auth.signUp({email:em,password:pw}):await sb.auth.signInWithPassword({email:em,password:pw});
   if(r.error){msg.textContent=r.error.message;return}
   if(!r.data.session){msg.textContent="Check your email to confirm, then sign in.";return}
-  $("pw").value="";showLogin(false);await loadNotes();
+  $("pw").value="";if(getPin()){unlocked=true;showLogin(false);await loadNotes()}else{showPin("set")}
 }
 $("signin").addEventListener("click",function(){auth("in")});
 $("signup").addEventListener("click",function(){auth("up")});
 $("out").addEventListener("click",async function(){await sb.auth.signOut();notes=[];render();showLogin(true)});
+function getPin(){try{return localStorage.getItem("notes.pin")}catch(e){return null}}
+async function sha(s){var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("notes-pin:"+s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")}
+var pinMode="check",buf="",first="",fails=0,lockUntil=0,unlocked=false;
+var TITLES={set:"Create a 6-digit key",confirm:"Confirm your key",check:"Enter your key"};
+function drawDots(){var d=$("dots").children;for(var i=0;i<6;i++)d[i].className=i<buf.length?"on":""}
+function showPin(m){
+  pinMode=m;buf="";first="";unlocked=false;
+  $("ptitle").textContent=TITLES[m];$("pmsg").textContent="";
+  $("login").hidden=true;$("top").hidden=true;$("list").hidden=true;$("status").hidden=true;$("compose").hidden=true;
+  $("pin").hidden=false;drawDots();
+}
+function unlock(){unlocked=true;$("pin").hidden=true;showLogin(false);loadNotes()}
+async function pinDone(){
+  if(pinMode==="set"){first=buf;buf="";pinMode="confirm";$("ptitle").textContent=TITLES.confirm;drawDots();return}
+  if(pinMode==="confirm"){
+    if(buf===first){try{localStorage.setItem("notes.pin",await sha(buf))}catch(e){}unlock();return}
+    showPin("set");$("pmsg").textContent="Keys did not match. Try again.";return;
+  }
+  if((await sha(buf))===getPin()){fails=0;unlock();return}
+  fails++;buf="";drawDots();
+  if(fails>=5){lockUntil=Date.now()+30000;fails=0;$("pmsg").textContent="Too many tries. Wait 30 seconds."}
+  else $("pmsg").textContent="Wrong key.";
+}
+async function press(d){
+  if(Date.now()<lockUntil||buf.length>=6)return;
+  buf+=d;drawDots();$("pmsg").textContent="";
+  if(buf.length===6)await pinDone();
+}
+(function buildPad(){
+  var dots=$("dots"),pad=$("pad");
+  for(var i=0;i<6;i++)dots.appendChild(document.createElement("i"));
+  ["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(function(k){
+    var b=document.createElement("button");b.textContent=k;
+    if(!k)b.className="x";
+    else if(k==="⌫")b.addEventListener("click",function(){buf=buf.slice(0,-1);drawDots()});
+    else b.addEventListener("click",function(){press(k)});
+    pad.appendChild(b);
+  });
+})();
+$("forgot").addEventListener("click",async function(){
+  try{localStorage.removeItem("notes.pin")}catch(e){}
+  await sb.auth.signOut();notes=[];render();$("pin").hidden=true;showLogin(true);
+});
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden&&sb&&unlocked&&getPin()&&$("pin").hidden&&$("login").hidden){notes=[];render();showPin("check")}
+});
 (async function init(){
   if(sb){
     var s=await sb.auth.getSession();
-    if(s.data.session){await loadNotes()}else{showLogin(true)}
+    if(s.data.session){showPin(getPin()?"check":"set")}else{showLogin(true)}
     return;
   }
   try{
