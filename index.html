@@ -23,7 +23,7 @@
     <button class="cancel" id="signup">Create account</button>
     <div class="status" id="lmsg"></div>
   </div>
-  <div class="top" id="top"><h1>Notes</h1><span><button class="sm" id="out">Sign out</button> <button class="plus" id="plus">+ Add</button></span></div>
+  <div class="top" id="top" hidden><h1>Notes</h1><span><button class="sm" id="out">Sign out</button> <button class="plus" id="plus">+ Add</button></span></div>
   <div class="compose" id="compose" hidden>
     <input id="label" placeholder="Title (optional)" autocomplete="off">
     <input id="user" placeholder="Username (optional)" autocomplete="off" autocapitalize="none">
@@ -31,8 +31,8 @@
     <textarea id="text" placeholder="Write a note"></textarea>
     <button class="add" id="add">Add</button><button class="cancel" id="cancel">Cancel</button>
   </div>
-  <div class="status" id="status">Loading…</div>
-  <div id="list"></div>
+  <div class="status" id="status" hidden>Loading…</div>
+  <div id="list" hidden></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script src="app.js"></script>
