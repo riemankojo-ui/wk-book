@@ -14,7 +14,7 @@ function setStatus(){
 
 /* ---- render ---- */
 function copyText(text,btn){
-  function done(){var o=btn.textContent;btn.textContent="Copied";btn.classList.add("done");setTimeout(function(){btn.textContent=o;btn.classList.remove("done")},1200)}
+  function done(){var o=btn.innerHTML,ic=btn.classList.contains("ic");btn.textContent=ic?"✓":"Copied";btn.classList.add("done");setTimeout(function(){btn.innerHTML=o;btn.classList.remove("done")},1200)}
   function fb(){
     var t=document.createElement("textarea");t.value=text;t.style.cssText="position:fixed;opacity:0";
     document.body.appendChild(t);t.focus();t.select();
@@ -31,7 +31,7 @@ function row(label,val,secret){
   var hid=secret;v.textContent=secret?"••••••••":val;
   if(secret)v.addEventListener("click",function(){hid=!hid;v.textContent=hid?"••••••••":val});
   m.appendChild(k);m.appendChild(v);
-  var b=document.createElement("button");b.className="sm";b.textContent="Copy";
+  var b=document.createElement("button");b.className="sm ic";b.setAttribute("aria-label","Copy");b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
   b.addEventListener("click",function(){copyText(val,b)});
   r.appendChild(m);r.appendChild(b);return r;
 }

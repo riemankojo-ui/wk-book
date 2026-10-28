@@ -39,5 +39,6 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .txt{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;font-size:15px}
 .acts{display:flex;gap:6px;margin-top:10px}
 .sm{padding:4px 10px;font-size:11px;color:rgba(255,255,255,.8);background:rgba(255,255,255,.12);border:0;flex-shrink:0}
+.sm.ic{padding:6px 8px;background:transparent;color:#d8d6cf;font-size:15px;line-height:1}
 .sm.done{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 .empty{text-align:center;color:var(--mute);padding:32px 10px;font-size:14px}
