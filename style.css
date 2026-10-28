@@ -19,8 +19,12 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .plus{padding:9px 16px;font-size:14px;font-weight:600;background:var(--acc);color:var(--acc-ink);border-radius:20px}
 .cancel{width:100%;padding:12px;font-size:15px;border-radius:12px;background:transparent;color:var(--mute);border:1px solid var(--line)}
 .status{color:var(--mute);font-size:12px;margin:10px 2px 18px}
-.login>*+*{margin-top:8px}
-.pin{text-align:center;padding-top:40px}
+.login{min-height:80vh;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.login>*+*{margin-top:10px}
+.login h1{font-size:28px;margin:0 0 4px}
+.login .sub{color:var(--mute);font-size:14px;margin:0 0 18px}
+.login .status{margin:6px 0 0;min-height:18px}
+.pin{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .dots{display:flex;justify-content:center;gap:14px;margin:22px 0}
 .dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid #55555c}
 .dots i.on{background:var(--acc);border-color:var(--acc)}
